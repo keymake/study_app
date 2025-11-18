@@ -1,3 +1,8 @@
+from streamlit.runtime.storage import FileStorage
+storage = FileStorage("study")
+
+RECORD_FILE = storage.path("records.json")
+
 import streamlit as st
 import json, os
 from datetime import datetime, timedelta, timezone, date
@@ -12,13 +17,13 @@ KST = timezone(timedelta(hours=9))  # 한국 표준시
 
 # JSON 파일 로드
 def load_data():
-    if not os.path.exists("records.json"):
+    if not os.path.exists(RECORD_FILE):
         return {"total_points": 0, "days": {}}
-    with open("records.json", "r", encoding="utf-8") as f:
+    with open(RECORD_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def save_data(data):
-    with open("records.json", "w", encoding="utf-8") as f:
+    with open(RECORD_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 # 날짜 헬퍼
