@@ -9,6 +9,7 @@ st.set_page_config(
 
 KST = timezone(timedelta(hours=9))  # 한국 표준시
 
+
 # JSON 파일 로드
 def load_data():
     if not os.path.exists("records.json"):
