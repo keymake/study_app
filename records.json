@@ -1,31 +1,9 @@
 {
-  "total_points": 0.3,
+  "total_points": 0,
   "days": {
-    "2025-11-17": {
-      "tasks": [
-        {
-          "name": "영어단어 30",
-          "done": true
-        },
-        {
-          "name": "수학1 30페이지까지",
-          "done": true
-        },
-        {
-          "name": "미분 30페이지까지",
-          "done": true
-        },
-        {
-          "name": "수학 2 30페이지까지",
-          "done": true
-        },
-        {
-          "name": "일본어공부 기초",
-          "done": true
-        }
-      ],
-      "status": "T",
-      "points": 0.3
+    "2025-11-18": {
+      "tasks": [],
+      "status": "미확정"
     }
   }
 }
