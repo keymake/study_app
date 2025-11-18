@@ -1,3 +1,9 @@
+
+st.set_page_config(
+    page_title="성진 공부프로젝트",  # 홈화면에 뜨는 앱 이름
+    page_icon="📘"  # 아이콘 이모지로도 가능
+)
+
 import streamlit as st
 import json, os
 from datetime import datetime, timedelta, timezone, date
