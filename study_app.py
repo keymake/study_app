@@ -121,7 +121,7 @@ def fill_missing_days_as_F(today_str):
 
 
 # -------------------------------------------
-# 최근 T 이전 날짜 싹 삭제 (너 원래 코드 그대로 유지)
+# 최근 T 이전 날짜 싹 삭제
 # -------------------------------------------
 def prune_before_last_T():
     all_days = load_all_days()
@@ -196,7 +196,7 @@ with st.form("add_task_form"):
         tasks.append({"name": new_task, "done": False})
         today_data["tasks"] = tasks
         save_day(today, today_data)
-        st.experimental_rerun()
+        st.rerun()   # ← 수정한 부분 (실험실 rerun 삭제됨)
 
 
 # -------------------------------------------
