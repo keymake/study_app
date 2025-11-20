@@ -196,7 +196,7 @@ with st.form("add_task_form"):
         tasks.append({"name": new_task, "done": False})
         today_data["tasks"] = tasks
         save_day(today, today_data)
-        st.rerun()   # 최신 streamlit용 rerun
+        st.rerun()
 
 
 # -------------------------------------------
@@ -251,8 +251,15 @@ if all_done:
 
 
 # -------------------------------------------
-# 오늘 정보 표시
+# 오늘 정보 표시 + 상태 표시 추가
 # -------------------------------------------
 st.markdown("---")
+
+# 상태 문구 추가된 부분
+if today_data.get("status") == "미확정":
+    st.info("오늘은 아직 F입니다.")
+elif today_data.get("status") == "T":
+    st.success("오늘은 T로 기록되었습니다.")
+
 st.write(f"📅 오늘 날짜: {today}")
 st.write(f"🏆 총합 포인트: **{load_total_points()}pt**")
