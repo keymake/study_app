@@ -86,11 +86,9 @@ def load_all_days():
 # -------------------------------------------
 def fill_missing_days_as_F(today_str):
     all_days = load_all_days()
-    if not all_days:
-        return
-
     today_d = to_date(today_str)
 
+    # 과거 T 날짜들 찾기
     t_dates = [
         to_date(row["date"])
         for row in all_days
@@ -98,9 +96,12 @@ def fill_missing_days_as_F(today_str):
     ]
 
     if not t_dates:
-        return
+        # 과거에 T 없으면 → 단순히 오늘 바로 전날까지만 캘린더로 채움
+        last_t_date = today_d - timedelta(days=1)
+    else:
+        last_t_date = max(t_dates)
 
-    last_t_date = max(t_dates)
+    # 캘린더 기준으로 last_t_date+1 ~ today-1 까지 모두 F 처리
     cur = last_t_date + timedelta(days=1)
     end = today_d - timedelta(days=1)
 
@@ -108,8 +109,11 @@ def fill_missing_days_as_F(today_str):
 
     while cur <= end:
         d_str = to_str(cur)
+
+        # row가 없더라도 강제로 생성함
         row = load_day(d_str)
 
+        # 이미 T/F가 아니라면 F로 확정
         if row.get("status") not in ["T", "F"]:
             total -= 0.3
             row["status"] = "F"
@@ -118,6 +122,7 @@ def fill_missing_days_as_F(today_str):
             save_total_points(total)
 
         cur += timedelta(days=1)
+
 
 
 # -------------------------------------------
