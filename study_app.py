@@ -196,20 +196,46 @@ with st.form("add_task_form"):
         tasks.append({"name": new_task, "done": False})
         today_data["tasks"] = tasks
         save_day(today, today_data)
-        st.rerun()   # ← 수정한 부분 (실험실 rerun 삭제됨)
+        st.rerun()   # 최신 streamlit용 rerun
 
 
 # -------------------------------------------
-# 체크박스 UI
+# 체크박스 + 수정/삭제 UI
 # -------------------------------------------
 done_list = []
+
+st.markdown("### ✏️ 항목 관리")
+
 for i, task in enumerate(tasks):
-    done = st.checkbox(task["name"], value=task["done"], key=f"task_{i}")
-    tasks[i]["done"] = done
+    col1, col2, col3 = st.columns([5, 3, 2])
+
+    with col1:
+        done = st.checkbox(task["name"], value=task["done"], key=f"task_{i}")
+        tasks[i]["done"] = done
+
+    with col2:
+        new_name = st.text_input(
+            f"edit_{i}",
+            value=task["name"],
+            label_visibility="collapsed",
+        )
+
+    with col3:
+        if st.button("삭제", key=f"del_{i}"):
+            tasks.pop(i)
+            today_data["tasks"] = tasks
+            save_day(today, today_data)
+            st.rerun()
+
+    # 이름 수정 반영
+    if new_name != task["name"]:
+        tasks[i]["name"] = new_name
+
     done_list.append(done)
 
 today_data["tasks"] = tasks
 save_day(today, today_data)
+
 
 # -------------------------------------------
 # 모든 항목 완료 → T 처리
