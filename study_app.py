@@ -141,23 +141,17 @@ def fill_missing_days_as_F(today_str):
 # -------------------------------------------
 # 최근 T 이전 날짜 삭제
 # -------------------------------------------
+# -------------------------------------------
+# 오래된 기록 삭제 (30일 보관 정책)
+# -------------------------------------------
 def prune_before_last_T():
-    all_days = load_all_days()
-    if not all_days:
-        return
+    today_date = datetime.now(KST).date()
+    limit_date = today_date - timedelta(days=30)
+    limit_str = limit_date.strftime("%Y-%m-%d")
 
-    t_dates = [
-        to_date(row["date"])
-        for row in all_days
-        if row.get("status") == "T"
-    ]
-    if not t_dates:
-        return
+    # 30일보다 이전(더 오래된) 기록 삭제
+    supabase.table("study_records").delete().lt("date", limit_str).execute()
 
-    last_t = max(t_dates)
-    cutoff = to_str(last_t)
-
-    supabase.table("study_records").delete().lt("date", cutoff).execute()
 
 
 # -------------------------------------------
