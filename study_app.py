@@ -23,7 +23,12 @@ supabase = get_supabase_client()
 # Config Helpers (total_points 저장용)
 # -------------------------------------------
 def load_total_points():
-    res = supabase.table("config").select("*").eq("key", "study_total_points").execute()
+    res = (
+        supabase.table("config")
+        .select("*")
+        .eq("key", "study_total_points")
+        .execute()
+    )
     rows = res.data or []
     if not rows:
         return 0.0
@@ -34,7 +39,10 @@ def load_total_points():
 
 
 def save_total_points(v: float):
-    supabase.table("config").upsert({"key": "study_total_points", "value": str(v)}).execute()
+    supabase.table("config").upsert(
+        {"key": "study_total_points", "value": str(v)},
+        on_conflict="key"
+    ).execute()
 
 
 # -------------------------------------------
@@ -52,7 +60,12 @@ def to_str(d: date) -> str:
 # DB Helpers
 # -------------------------------------------
 def load_day(date_str: str):
-    res = supabase.table("study_records").select("*").eq("date", date_str).execute()
+    res = (
+        supabase.table("study_records")
+        .select("*")
+        .eq("date", date_str)
+        .execute()
+    )
     rows = res.data or []
     if rows:
         return rows[0]
@@ -63,17 +76,23 @@ def load_day(date_str: str):
         "status": "미확정",
         "points": None
     }
-    supabase.table("study_records").insert(new_row).execute()
+    supabase.table("study_records").upsert(
+        new_row,
+        on_conflict="date"
+    ).execute()
     return new_row
 
 
 def save_day(date_str: str, data: dict):
-    supabase.table("study_records").upsert({
-        "date": date_str,
-        "tasks": data.get("tasks", []),
-        "status": data.get("status", "미확정"),
-        "points": data.get("points")
-    }).execute()
+    supabase.table("study_records").upsert(
+        {
+            "date": date_str,
+            "tasks": data.get("tasks", []),
+            "status": data.get("status", "미확정"),
+            "points": data.get("points")
+        },
+        on_conflict="date"
+    ).execute()
 
 
 def load_all_days():
@@ -88,7 +107,6 @@ def fill_missing_days_as_F(today_str):
     all_days = load_all_days()
     today_d = to_date(today_str)
 
-    # 과거 T 날짜들 찾기
     t_dates = [
         to_date(row["date"])
         for row in all_days
@@ -96,12 +114,10 @@ def fill_missing_days_as_F(today_str):
     ]
 
     if not t_dates:
-        # 과거에 T 없으면 → 단순히 오늘 바로 전날까지만 캘린더로 채움
         last_t_date = today_d - timedelta(days=1)
     else:
         last_t_date = max(t_dates)
 
-    # 캘린더 기준으로 last_t_date+1 ~ today-1 까지 모두 F 처리
     cur = last_t_date + timedelta(days=1)
     end = today_d - timedelta(days=1)
 
@@ -110,10 +126,8 @@ def fill_missing_days_as_F(today_str):
     while cur <= end:
         d_str = to_str(cur)
 
-        # row가 없더라도 강제로 생성함
         row = load_day(d_str)
 
-        # 이미 T/F가 아니라면 F로 확정
         if row.get("status") not in ["T", "F"]:
             total -= 0.3
             row["status"] = "F"
@@ -124,9 +138,8 @@ def fill_missing_days_as_F(today_str):
         cur += timedelta(days=1)
 
 
-
 # -------------------------------------------
-# 최근 T 이전 날짜 싹 삭제
+# 최근 T 이전 날짜 삭제
 # -------------------------------------------
 def prune_before_last_T():
     all_days = load_all_days()
@@ -157,7 +170,6 @@ def update_status_and_points(date_str, new_status):
     today_d = to_date(date_str)
     y_str = to_str(today_d - timedelta(days=1))
 
-    # 어제 row
     all_rows = load_all_days()
     y_rows = [r for r in all_rows if r["date"] == y_str]
     prev_status = y_rows[0].get("status") if y_rows else None
@@ -232,7 +244,6 @@ for i, task in enumerate(tasks):
             save_day(today, today_data)
             st.rerun()
 
-    # 이름 수정 반영
     if new_name != task["name"]:
         tasks[i]["name"] = new_name
 
@@ -253,18 +264,16 @@ if all_done:
         update_status_and_points(today, "T")
     prune_before_last_T()
 
-     # ★ 추가
     today_data = load_day(today)
 
     st.success("✅ 모든 항목 완료! 오늘은 T로 기록되었습니다.")
 
 
 # -------------------------------------------
-# 오늘 정보 표시 + 상태 표시 추가
+# 오늘 정보 표시 + 상태 표시
 # -------------------------------------------
 st.markdown("---")
 
-# 상태 문구 추가된 부분
 if today_data.get("status") == "미확정":
     st.info("오늘은 아직 F입니다.")
 elif today_data.get("status") == "T":
