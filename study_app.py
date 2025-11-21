@@ -252,6 +252,10 @@ if all_done:
     if today_data.get("status") != "T":
         update_status_and_points(today, "T")
     prune_before_last_T()
+
+     # ★ 추가
+    today_data = load_day(today)
+
     st.success("✅ 모든 항목 완료! 오늘은 T로 기록되었습니다.")
 
 
