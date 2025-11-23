@@ -269,7 +269,7 @@ if all_done:
 st.markdown("---")
 
 if today_data.get("status") == "미확정":
-    st.info("오늘은 아직 F입니다.")
+    st.info("오늘은 아직 F입니다. 자정 넘어갈 시 F 확정.")
 elif today_data.get("status") == "T":
     st.success("오늘은 T로 기록되었습니다.")
 
